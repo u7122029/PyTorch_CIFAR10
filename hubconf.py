@@ -1,9 +1,1 @@
-from cifar10_models import (
-    densenet, 
-    googlenet,
-    inception,
-    mobilenetv2,
-    resnet_orig,
-    resnet,
-    vgg
-)
+from cifar10_models.densenet import densenet121, densenet161, densenet169
