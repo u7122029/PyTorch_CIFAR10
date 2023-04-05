@@ -12,6 +12,10 @@ _GoogLeNetOuputs = namedtuple(
     "GoogLeNetOuputs", ["logits", "aux_logits2", "aux_logits1"]
 )
 
+cifar10_pretrained_weight_urls = {
+    'googlenet': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/googlenet.pt'
+}
+
 
 def googlenet(pretrained=False, progress=True, device="cpu", **kwargs):
     r"""GoogLeNet (Inception v1) model architecture from
@@ -27,10 +31,7 @@ def googlenet(pretrained=False, progress=True, device="cpu", **kwargs):
     """
     model = GoogLeNet()
     if pretrained:
-        script_dir = os.path.dirname(__file__)
-        state_dict = torch.load(
-            script_dir + "/state_dicts/googlenet.pt", map_location=device
-        )
+        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls["googlenet"], map_location=device)
         model.load_state_dict(state_dict)
     return model
 
