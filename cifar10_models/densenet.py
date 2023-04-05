@@ -169,6 +169,11 @@ class DenseNet(nn.Module):
         out = self.classifier(out)
         return out
 
+cifar10_pretrained_weight_urls = {
+    'densenet121': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet121.pt',
+    'densenet161': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet161.pt',
+    'densenet169': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet169.pt'
+}
 
 def _densenet(
     arch,
@@ -182,10 +187,7 @@ def _densenet(
 ):
     model = DenseNet(growth_rate, block_config, num_init_features, **kwargs)
     if pretrained:
-        script_dir = os.path.dirname(__file__)
-        state_dict = torch.load(
-            script_dir + "/state_dicts/" + arch + ".pt", map_location=device
-        )
+        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls[arch], map_location=device)
         model.load_state_dict(state_dict)
     return model
 
