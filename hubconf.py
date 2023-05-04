@@ -3,5 +3,5 @@ from cifar10_models.googlenet import googlenet
 from cifar10_models.inception import inception_v3
 
 if __name__ == "__main__":
-    model = densenet169(pretrained=True)
+    model = inception_v3(pretrained=True)
     print(model)

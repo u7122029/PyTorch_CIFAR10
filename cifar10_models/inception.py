@@ -32,7 +32,7 @@ def inception_v3(pretrained=False, progress=True, device="cpu", **kwargs):
     """
     model = Inception3()
     if pretrained:
-        state_dict = torch.load(cifar10_pretrained_weight_urls["inception"], map_location=device)
+        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls["inception"], map_location=device)
         model.load_state_dict(state_dict)
     return model
 
