@@ -28,6 +28,10 @@ all_classifiers = {
 
 
 class CIFAR10Module(pl.LightningModule):
+    @property
+    def hparams(self):
+        return self._hparams
+
     def __init__(self, hparams):
         super().__init__()
         self.hparams = hparams
@@ -76,3 +80,7 @@ class CIFAR10Module(pl.LightningModule):
             "name": "learning_rate",
         }
         return [optimizer], [scheduler]
+
+    @hparams.setter
+    def hparams(self, value):
+        self._hparams = value

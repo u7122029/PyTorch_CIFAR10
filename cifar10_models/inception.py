@@ -7,6 +7,9 @@ import torch.nn.functional as F
 
 __all__ = ["Inception3", "inception_v3"]
 
+cifar10_pretrained_weight_urls = {
+    'inception': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/inception_v3.pt'
+}
 
 _InceptionOuputs = namedtuple("InceptionOuputs", ["logits", "aux_logits"])
 
@@ -29,10 +32,7 @@ def inception_v3(pretrained=False, progress=True, device="cpu", **kwargs):
     """
     model = Inception3()
     if pretrained:
-        script_dir = os.path.dirname(__file__)
-        state_dict = torch.load(
-            script_dir + "/state_dicts/inception_v3.pt", map_location=device
-        )
+        state_dict = torch.load(cifar10_pretrained_weight_urls["inception"], map_location=device)
         model.load_state_dict(state_dict)
     return model
 
