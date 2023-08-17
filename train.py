@@ -15,7 +15,6 @@ def main(args):
         CIFAR10Data.download_weights()
         return
 
-
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
 
     checkpoint = ModelCheckpoint(
@@ -41,8 +40,10 @@ def main(args):
             "cifar10_models", "state_dicts", args.classifier + ".pt"
         )
         model.model.load_state_dict(torch.load(state_dict))
-    if False:
-        trainer.fit(model, data.train_dataloader(), data.val_dataloader())
+        trainer.test(model, data.test_dataloader())
+        return
+
+    trainer.fit(model, data.train_dataloader(), data.val_dataloader())
     #trainer.test(model, data.test_dataloader()) # validation dataset is the same as the testing dataset. No need to test.
 
     if args.save_best:
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 
     # TRAINER args
     parser.add_argument("--classifier", type=str, default="linear")
-    parser.add_argument("--pretrained", type=int, default=0, choices=[0, 1])
+    parser.add_argument("--pretrained", type=int, default=1, choices=[0, 1])
 
     parser.add_argument("--precision", type=int, default=32, choices=[16, 32])
     parser.add_argument("--batch_size", type=int, default=256)

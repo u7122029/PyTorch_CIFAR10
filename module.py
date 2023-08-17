@@ -63,6 +63,7 @@ class CIFAR10Module(pl.LightningModule):
 
     def test_step(self, batch, batch_nb):
         loss, accuracy = self.forward(batch)
+        self.log_dict({"test_loss": loss, "test_acc": accuracy}, on_step=False, on_epoch=True, prog_bar=True)
         return {"loss": loss, "accuracy": accuracy}
 
     def configure_optimizers(self):
