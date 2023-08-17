@@ -12,10 +12,12 @@ from tqdm import tqdm
 class CIFAR10Data(pl.LightningDataModule):
     def __init__(self, args):
         super().__init__()
-        self.hparams = args
+        self.h_params = args
         self.mean = (0.4914, 0.4822, 0.4465)
         self.std = (0.2471, 0.2435, 0.2616)
 
+
+    @staticmethod
     def download_weights():
         url = (
             "https://rutgers.box.com/shared/static/gkw08ecs797j2et1ksmbg1w5t3idf5r5.zip"
@@ -48,19 +50,19 @@ class CIFAR10Data(pl.LightningDataModule):
     def train_dataloader(self):
         transform = T.Compose(
             [
-                T.RandomCrop(32, padding=4),
-                T.RandomHorizontalFlip(),
+                #T.RandomCrop(32, padding=4),
+                #T.RandomHorizontalFlip(),
                 T.ToTensor(),
                 T.Normalize(self.mean, self.std),
             ]
         )
-        dataset = CIFAR10(root=self.hparams.data_dir, train=True, transform=transform)
+        dataset = CIFAR10(root=self.h_params.data_dir, train=True, transform=transform, download=True)
         dataloader = DataLoader(
             dataset,
-            batch_size=self.hparams.batch_size,
-            num_workers=self.hparams.num_workers,
+            batch_size=self.h_params.batch_size,
+            num_workers=self.h_params.num_workers,
             shuffle=True,
-            drop_last=True,
+            #drop_last=True,
             pin_memory=True,
         )
         return dataloader
@@ -72,11 +74,11 @@ class CIFAR10Data(pl.LightningDataModule):
                 T.Normalize(self.mean, self.std),
             ]
         )
-        dataset = CIFAR10(root=self.hparams.data_dir, train=False, transform=transform)
+        dataset = CIFAR10(root=self.h_params.data_dir, train=False, transform=transform)
         dataloader = DataLoader(
             dataset,
-            batch_size=self.hparams.batch_size,
-            num_workers=self.hparams.num_workers,
+            batch_size=self.h_params.batch_size,
+            num_workers=self.h_params.num_workers,
             drop_last=True,
             pin_memory=True,
         )
