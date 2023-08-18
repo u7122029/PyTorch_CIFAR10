@@ -7,7 +7,7 @@ import torch.nn as nn
 __all__ = ["linear"]
 
 cifar10_pretrained_weight_urls = {
-    'linear': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/linear.pt'
+    'linear': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_addons/linear.pt'
 }
 
 
@@ -29,8 +29,8 @@ def linear(pretrained=False, progress=True, device="cpu", **kwargs):
     """
     model = Linear()
     if pretrained:
-        model = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls["linear"], map_location=device)
-        #model.load_state_dict(state_dict)
+        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls["linear"], map_location=device)
+        model.load_state_dict(state_dict)
     return model
 
 
