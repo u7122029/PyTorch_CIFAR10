@@ -52,8 +52,6 @@ def main(args):
         torch.save(loaded.model.state_dict(), f"cifar10_models/state_dicts/{args.classifier}.pt")
 
 
-
-
 if __name__ == "__main__":
     parser = ArgumentParser()
 
@@ -67,12 +65,12 @@ if __name__ == "__main__":
     )
 
     # TRAINER args
-    parser.add_argument("--classifier", type=str, default="linear")
-    parser.add_argument("--pretrained", type=int, default=1, choices=[0, 1])
+    parser.add_argument("--classifier", type=str, default="lenet5")
+    parser.add_argument("--pretrained", type=int, default=0, choices=[0, 1])
 
     parser.add_argument("--precision", type=int, default=32, choices=[16, 32])
     parser.add_argument("--batch_size", type=int, default=256)
-    parser.add_argument("--max_epochs", type=int, default=3) # default 100
+    parser.add_argument("--max_epochs", type=int, default=100) # default 100
     parser.add_argument("--num_workers", type=int, default=1)
     parser.add_argument("--gpu_id", type=str, default="3")
 
