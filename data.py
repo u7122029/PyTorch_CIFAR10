@@ -1,15 +1,77 @@
 import os
 import zipfile
 
-import pytorch_lightning as pl
+import lightning as lt
 import requests
 from torch.utils.data import DataLoader
 from torchvision import transforms as T
-from torchvision.datasets import CIFAR10
+from torchvision.datasets import CIFAR10, MNIST
 from tqdm import tqdm
 
 
-class CIFAR10Data(pl.LightningDataModule):
+class ToRGB:
+    def __init__(self):
+        pass
+
+    def __call__(self, sample):
+        _input = sample
+        return _input.repeat(3,1,1)
+
+
+class MNISTData(lt.LightningDataModule):
+    def __init__(self, args):
+        super().__init__()
+        self.data_dir = args.data_dir
+        self.batch_size = args.batch_size
+        self.num_workers = args.num_workers
+        self.prepare_data()
+        self.setup("whocares")
+
+    def prepare_data(self):
+        # This will be run on a single process
+        # We download the datasets here if they don't exist yet.
+        MNIST(self.data_dir, train=True, download=True)
+        MNIST(self.data_dir, train=False, download=True)
+
+    def setup(self, stage):
+        train_transform = T.Compose([T.Resize((32,32)),
+                                     T.RandomHorizontalFlip(),
+                                     T.RandomVerticalFlip(),
+                                     T.ToTensor(),
+                                     ToRGB()])
+        test_transform = T.Compose([T.Resize((32,32)),
+                                    T.ToTensor(),
+                                    ToRGB()])
+
+        self.train_ds = MNIST(
+            self.data_dir,
+            train=True,
+            transform=train_transform
+        )
+        self.test_ds = MNIST(
+            self.data_dir,
+            train=False,
+            transform=test_transform
+        )
+
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_ds,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=True
+        )
+
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_ds,
+            batch_size=len(self.test_ds),
+            num_workers=self.num_workers,
+            shuffle=False
+        )
+    
+
+class CIFAR10Data(lt.LightningDataModule):
     def __init__(self, args):
         super().__init__()
         self.h_params = args

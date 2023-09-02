@@ -11,7 +11,6 @@ from cifar10_models.resnet import resnet18, resnet34, resnet50
 from cifar10_models.vgg import vgg11_bn, vgg13_bn, vgg16_bn, vgg19_bn
 from cifar10_models.linear import linear
 from cifar10_models.lenet5 import lenet5
-from schduler import WarmupCosineLR
 
 all_classifiers = {
     "vgg11_bn": vgg11_bn(),
