@@ -169,11 +169,14 @@ class DenseNet(nn.Module):
         out = self.classifier(out)
         return out
 
+
 cifar10_pretrained_weight_urls = {
-    'densenet121': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet121.pt',
-    'densenet161': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet161.pt',
-    'densenet169': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet169.pt'
+    'densenet121-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet121.pt',
+    'densenet161-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet161.pt',
+    'densenet169-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet169.pt',
+    'densenet121-mnist':   'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_mnist/densenet121.pt'
 }
+
 
 def _densenet(
     arch,
@@ -183,16 +186,17 @@ def _densenet(
     pretrained,
     progress,
     device,
+    dataset,
     **kwargs
 ):
     model = DenseNet(growth_rate, block_config, num_init_features, **kwargs)
     if pretrained:
-        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls[arch], map_location=device)
+        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls[f"{arch}-{dataset}"], map_location=device)
         model.load_state_dict(state_dict)
     return model
 
 
-def densenet121(pretrained=False, progress=True, device="cpu", **kwargs):
+def densenet121(pretrained=False, progress=True, device="cpu", dataset="cifar10", **kwargs):
     r"""Densenet-121 model from
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
 
@@ -201,11 +205,11 @@ def densenet121(pretrained=False, progress=True, device="cpu", **kwargs):
         progress (bool): If True, displays a progress bar of the download to stderr
     """
     return _densenet(
-        "densenet121", 32, (6, 12, 24, 16), 64, pretrained, progress, device, **kwargs
+        "densenet121", 32, (6, 12, 24, 16), 64, pretrained, progress, device, dataset, **kwargs
     )
 
 
-def densenet161(pretrained=False, progress=True, device="cpu", **kwargs):
+def densenet161(pretrained=False, progress=True, device="cpu", dataset="cifar10", **kwargs):
     r"""Densenet-161 model from
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
 
@@ -214,11 +218,11 @@ def densenet161(pretrained=False, progress=True, device="cpu", **kwargs):
         progress (bool): If True, displays a progress bar of the download to stderr
     """
     return _densenet(
-        "densenet161", 48, (6, 12, 36, 24), 96, pretrained, progress, device, **kwargs
+        "densenet161", 48, (6, 12, 36, 24), 96, pretrained, progress, device, dataset, **kwargs
     )
 
 
-def densenet169(pretrained=False, progress=True, device="cpu", **kwargs):
+def densenet169(pretrained=False, progress=True, device="cpu", dataset="cifar10", **kwargs):
     r"""Densenet-169 model from
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
 
@@ -227,5 +231,5 @@ def densenet169(pretrained=False, progress=True, device="cpu", **kwargs):
         progress (bool): If True, displays a progress bar of the download to stderr
     """
     return _densenet(
-        "densenet169", 32, (6, 12, 32, 32), 64, pretrained, progress, device, **kwargs
+        "densenet169", 32, (6, 12, 32, 32), 64, pretrained, progress, device, dataset, **kwargs
     )

@@ -5,5 +5,5 @@ from cifar10_models.linear import linear
 from cifar10_models.lenet5 import lenet5
 
 if __name__ == "__main__":
-    model = lenet5(pretrained=True)
+    model = densenet121(pretrained=True,dataset="mnist")
     print(model)
