@@ -1,8 +1,8 @@
 import torch
-from torchvision.datasets import MNIST
+from torchvision.datasets import MNIST, SVHN
 import torchvision.transforms as T
-from torch.utils.data import DataLoader
-from data import ToRGB
+from torch.utils.data import DataLoader, ConcatDataset
+from data import ToRGB, SyntheticDigitsData
 import torch.nn as nn
 import torch.optim as optim
 from module import all_classifiers
@@ -11,7 +11,30 @@ import shutil
 from pathlib import Path
 
 # Training file that uses pure PyTorch - for when Lightning is unable to notice that your device has a GPU.
+TRAIN_TRANSFORMS = {
+    "mnist": T.Compose([T.Resize((32, 32)),
+                        T.RandomHorizontalFlip(),
+                        T.RandomVerticalFlip(),
+                        T.ToTensor(),
+                        ToRGB()]),
+    "svhn": T.Compose([T.ToTensor(),
+                       T.Normalize((0.4376821, 0.4437697, 0.47280442), (0.19803012, 0.20101562, 0.19703614))]),
+    "synth_digits": T.Compose([T.Resize((32,32)),
+                               T.RandomRotation(degrees=(-45,45)),
+                               T.ToTensor(),
+                               T.Normalize((0.4368, 0.4158, 0.3904), (0.2815, 0.2754, 0.2803))])
+}
 
+TEST_TRANSFORMS = {
+    "mnist": T.Compose([T.Resize((32, 32)),
+                        T.ToTensor(),
+                        ToRGB()]),
+    "synth_digits": T.Compose([T.Resize((32,32)),
+                               T.ToTensor(),
+                               T.Normalize((0.4368, 0.4158, 0.3904), (0.2815, 0.2754, 0.2803))]),
+    "svhn": T.Compose([T.ToTensor(),
+                       T.Normalize((0.4376821, 0.4437697, 0.47280442), (0.19803012, 0.20101562, 0.19703614))])
+}
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -37,15 +60,6 @@ class AverageMeter(object):
 
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-
-train_transform = T.Compose([T.Resize((32,32)),
-                                     T.RandomHorizontalFlip(),
-                                     T.RandomVerticalFlip(),
-                                     T.ToTensor(),
-                                     ToRGB()])
-test_transform = T.Compose([T.Resize((32,32)),
-                            T.ToTensor(),
-                            ToRGB()])
 
 
 def accuracy(output, target, topk=(1,)):
@@ -119,17 +133,85 @@ def save_checkpoint(model, weights_path, is_best: bool):
         shutil.copyfile(f"{weights_path}/checkpoint.pt", f"{weights_path}/best.pt")
 
 
-def main(model_name, lr=0.005, epochs=25, test_pretrained=False):
+def get_dataloaders_svhn(batch_size, custom_transform_train=None, custom_transform_test=None):
+    transform_train = TRAIN_TRANSFORMS['svhn']
+    transform_test = TEST_TRANSFORMS['svhn']
+
+    if custom_transform_train:
+        transform_train = custom_transform_train
+
+    if custom_transform_test:
+        transform_test = custom_transform_test
+
+    dataset_train = SVHN("/ml_datasets", split="train", download=True, transform=transform_train)
+    dataset_test = SVHN("/ml_datasets", split="test", download=True, transform=transform_test)
+    dataset_extra = SVHN("/ml_datasets", split="extra", download=True, transform=transform_train)
+    return (DataLoader(ConcatDataset([dataset_train, dataset_extra]), shuffle=True, batch_size=batch_size),
+            DataLoader(dataset_test))
+
+
+def get_dataloaders_mnist(batch_size, custom_transform_train=None, custom_transform_test=None):
+    train_transform = TRAIN_TRANSFORMS["mnist"]
+    test_transform = TEST_TRANSFORMS["mnist"]
+    if custom_transform_train:
+        train_transform = custom_transform_train
+
+    if custom_transform_test:
+        test_transform = custom_transform_test
+
     dataset_train = MNIST(root="/ml_datasets", train=True, transform=train_transform)
     dataset_test = MNIST(root="/ml_datasets", train=False, transform=test_transform)
-    dl_train = DataLoader(dataset=dataset_train,batch_size=64, shuffle=True)
+    dl_train = DataLoader(dataset=dataset_train, batch_size=batch_size, shuffle=True)
     dl_test = DataLoader(dataset=dataset_test)
+    return dl_train, dl_test
+
+
+def get_dataloaders_synth_digits(batch_size=64, custom_transform_train=None, custom_transform_test=None):
+    train_transform = TRAIN_TRANSFORMS["synth_digits"]
+    test_transform = TEST_TRANSFORMS["synth_digits"]
+    if custom_transform_train:
+        train_transform = custom_transform_train
+
+    if custom_transform_test:
+        test_transform = custom_transform_test
+
+    dataset_train = SyntheticDigitsData(root="/ml_datasets", train=True, transform=train_transform)
+    dataset_test = SyntheticDigitsData(root="/ml_datasets", train=False, transform=test_transform)
+    train_dataloader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True)
+    test_dataloader = DataLoader(dataset_test)
+    return train_dataloader, test_dataloader
+
+
+def get_dataset(dataset_name: str, custom_transform_train=None, custom_transform_test=None, batch_size=64):
+    if dataset_name == "cifar10":
+        raise Exception("no cifar10 for now.")
+    elif dataset_name == "mnist":
+        return get_dataloaders_mnist(batch_size, custom_transform_train, custom_transform_test)
+    elif dataset_name == "svhn":
+        return get_dataloaders_svhn(batch_size, custom_transform_train, custom_transform_test)
+    elif dataset_name == "synth_digits":
+        return get_dataloaders_synth_digits(batch_size, custom_transform_train, custom_transform_test)
+
+    raise Exception("Invalid dataset name.")
+
+
+def main(dataset_name,
+         model_name,
+         lr=0.005,
+         epochs=25,
+         test_pretrained=False,
+         pretrained_dset="svhn",
+         batch_size=64,
+         custom_transform_train=None,
+         custom_transform_test=None):
+    dl_train, dl_test = get_dataset(dataset_name, custom_transform_train, custom_transform_test,
+                                    batch_size=batch_size)
 
     model = all_classifiers[model_name]
     model.to(DEVICE)
 
     if test_pretrained:
-        state_dict = torch.load(f"checkpoints/mnist/{model_name}/best.pt")
+        state_dict = torch.load(f"checkpoints/{pretrained_dset}/{model_name}/best.pt")
         model.load_state_dict(state_dict)
         acc, losses = test_model(dl_test, model)
         print(f"test set acc: {acc}")
@@ -185,11 +267,30 @@ def main(model_name, lr=0.005, epochs=25, test_pretrained=False):
         best_acc = max(acc, best_acc)
         save_checkpoint(
             model,
-            f"checkpoints/mnist/{model_name}",
+            f"checkpoints/{dataset_name}/{model_name}",
             is_best
         )
     print(f"best test acc: {best_acc}")
 
 
 if __name__ == "__main__":
-    main("googlenet")
+    # Get mean and std
+    # Data augmentation always comes first before normalisation in preprocessing.
+    # Also
+    #dataset_train = SyntheticDigitsData(root="/ml_datasets", train=True, transform=TRAIN_TRANSFORMS["synth_digits"])
+    #dataset_test = SyntheticDigitsData(root="/ml_datasets", train=False, transform=TEST_TRANSFORMS["synth_digits"])
+    #complete_dset = torch.stack([dataset_train[x][0] for x in range(len(dataset_train))] + [dataset_test[x][0] for x in range(len(dataset_test))])
+    #print(complete_dset.shape)
+    #mean = torch.mean(complete_dset, dim=[0,2,3])
+    #std = torch.std(complete_dset, dim=[0,2,3])
+    #print(mean, std)
+    """main("mnist",
+         "linear",
+         test_pretrained=True,
+         pretrained_dset="svhn"
+         )"""
+    main("mnist",
+         "mobilenet_v2",
+         test_pretrained=True,
+         pretrained_dset="svhn"
+         )

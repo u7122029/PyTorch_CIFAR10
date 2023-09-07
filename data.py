@@ -3,10 +3,14 @@ import zipfile
 
 import lightning as lt
 import requests
-from torch.utils.data import DataLoader
+import torchvision.io
+from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms as T
 from torchvision.datasets import CIFAR10, MNIST
+from torchvision.transforms.functional import to_pil_image
 from tqdm import tqdm
+from pathlib import Path
+from PIL import Image
 
 
 class ToRGB:
@@ -148,3 +152,43 @@ class CIFAR10Data(lt.LightningDataModule):
 
     def test_dataloader(self):
         return self.val_dataloader()
+
+
+class SyntheticDigitsData(Dataset):
+    def __init__(self, root: str, train=True, transform=None):
+        super().__init__()
+        self.root = Path(root) / "synthetic_digits"
+        self.train = train
+        self.transform = transform
+
+        self.imgs = []
+        self.labels = []
+        if self.train:
+            self.root /= "imgs_train"
+        else:
+            self.root /= "imgs_valid"
+
+        for digit in range(10):
+            current_dir = self.root / str(digit)
+            for img_idx in range(1000 if self.train else 200):
+                filename = f"{digit}_{str(img_idx + 1000 if not self.train else img_idx).zfill(5)}.jpg"
+                complete_path = current_dir / filename
+                self.labels.append(digit)
+                img = torchvision.io.read_image(str(complete_path))
+                self.imgs.append(img)
+
+    def __getitem__(self, idx):
+        img = self.imgs[idx]
+        img = to_pil_image(img)
+        label = self.labels[idx]
+        if self.transform:
+            img = self.transform(img)
+
+        return img, label
+
+    def __len__(self):
+        return len(self.labels)
+
+
+
+

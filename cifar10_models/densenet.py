@@ -174,7 +174,8 @@ cifar10_pretrained_weight_urls = {
     'densenet121-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet121.pt',
     'densenet161-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet161.pt',
     'densenet169-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/densenet169.pt',
-    'densenet121-mnist':   'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_mnist/densenet121.pt'
+    'densenet121-mnist':   'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_mnist/densenet121.pt',
+    'densenet121-svhn':    'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_svhn/densenet121.pt',
 }
 
 

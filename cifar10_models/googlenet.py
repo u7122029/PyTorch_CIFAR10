@@ -13,11 +13,12 @@ _GoogLeNetOuputs = namedtuple(
 )
 
 cifar10_pretrained_weight_urls = {
-    'googlenet': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/googlenet.pt'
+    'googlenet-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/googlenet.pt',
+    'googlenet-svhn': "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_svhn/googlenet.pt"
 }
 
 
-def googlenet(pretrained=False, progress=True, device="cpu", **kwargs):
+def googlenet(pretrained=False, progress=True, device="cpu", dataset="cifar10", **kwargs):
     r"""GoogLeNet (Inception v1) model architecture from
     `"Going Deeper with Convolutions" <http://arxiv.org/abs/1409.4842>`_.
 
@@ -31,7 +32,7 @@ def googlenet(pretrained=False, progress=True, device="cpu", **kwargs):
     """
     model = GoogLeNet()
     if pretrained:
-        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls["googlenet"], map_location=device)
+        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls[f"googlenet-{dataset}"], map_location=device)
         model.load_state_dict(state_dict)
     return model
 

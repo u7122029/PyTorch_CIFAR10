@@ -7,11 +7,12 @@ import torch.nn as nn
 __all__ = ["linear"]
 
 cifar10_pretrained_weight_urls = {
-    'linear': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_addons/linear.pt'
+    'linear-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_addons/linear.pt',
+    'linear-svhn': "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_svhn/linear.pt"
 }
 
 
-def linear(pretrained=False, progress=True, device="cpu", **kwargs):
+def linear(pretrained=False, progress=True, device="cpu", dataset="cifar10", **kwargs):
     r"""Inception v3 model architecture from
     `"Rethinking the Inception Architecture for Computer Vision" <http://arxiv.org/abs/1512.00567>`_.
 
@@ -29,7 +30,7 @@ def linear(pretrained=False, progress=True, device="cpu", **kwargs):
     """
     model = Linear()
     if pretrained:
-        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls["linear"], map_location=device)
+        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls[f"linear-{dataset}"], map_location=device)
         model.load_state_dict(state_dict)
     return model
 
