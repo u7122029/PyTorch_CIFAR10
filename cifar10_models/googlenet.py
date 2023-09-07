@@ -14,7 +14,7 @@ _GoogLeNetOuputs = namedtuple(
 
 cifar10_pretrained_weight_urls = {
     'googlenet-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/googlenet.pt',
-    'googlenet-svhn': "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_svhn/googlenet.pt"
+    'googlenet-svhn': "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_svhn/googlenet-svhn.pt"
 }
 
 

@@ -8,7 +8,7 @@ __all__ = ["linear"]
 
 cifar10_pretrained_weight_urls = {
     'linear-cifar10': 'https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_addons/linear.pt',
-    'linear-svhn': "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_svhn/linear.pt"
+    'linear-svhn': "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained_svhn/linear-svhn.pt"
 }
 
 
