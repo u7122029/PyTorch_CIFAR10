@@ -5,5 +5,5 @@ from cifar10_models.linear import linear
 from cifar10_models.lenet5 import lenet5
 
 if __name__ == "__main__":
-    model = googlenet(pretrained=True, dataset="svhn")
+    model = densenet121(pretrained=True, dataset="svhn")
     print(model)
