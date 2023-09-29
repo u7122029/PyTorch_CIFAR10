@@ -192,6 +192,7 @@ def _densenet(
 ):
     model = DenseNet(growth_rate, block_config, num_init_features, **kwargs)
     if pretrained:
+        print("hub repo: here pretrained")
         state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls[f"{arch}-{dataset}"], map_location=device)
         model.load_state_dict(state_dict)
     return model
