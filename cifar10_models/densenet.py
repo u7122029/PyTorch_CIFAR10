@@ -205,7 +205,7 @@ def densenet121(pretrained=False, progress=True, device="cpu", dataset="cifar10"
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    print(dataset)
+    print("hub repo:",dataset)
     return _densenet(
         "densenet121", 32, (6, 12, 24, 16), 64, pretrained, progress, device, dataset, **kwargs
     )
