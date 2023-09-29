@@ -192,7 +192,6 @@ def _densenet(
 ):
     model = DenseNet(growth_rate, block_config, num_init_features, **kwargs)
     if pretrained:
-        print("hub repo: here pretrained")
         state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls[f"{arch}-{dataset}"], map_location=device)
         model.load_state_dict(state_dict)
     return model
@@ -206,7 +205,6 @@ def densenet121(pretrained=False, progress=True, device="cpu", dataset="cifar10"
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    print("hub repo:",dataset)
     return _densenet(
         "densenet121", 32, (6, 12, 24, 16), 64, pretrained, progress, device, dataset, **kwargs
     )
