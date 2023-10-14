@@ -11,6 +11,13 @@ __all__ = [
     "vgg19_bn",
 ]
 
+cifar10_pretrained_weight_urls = {
+    "vgg11_bn": "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/vgg11_bn.pt",
+    "vgg13_bn": "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/vgg13_bn.pt",
+    "vgg16_bn": "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/vgg16_bn.pt",
+    "vgg19_bn": "https://github.com/u7122029/PyTorch_CIFAR10/releases/download/pretrained/vgg19_bn.pt",
+}
+
 
 class VGG(nn.Module):
     def __init__(self, features, num_classes=10, init_weights=True):
@@ -124,10 +131,7 @@ def _vgg(arch, cfg, batch_norm, pretrained, progress, device, **kwargs):
         kwargs["init_weights"] = False
     model = VGG(make_layers(cfgs[cfg], batch_norm=batch_norm), **kwargs)
     if pretrained:
-        script_dir = os.path.dirname(__file__)
-        state_dict = torch.load(
-            script_dir + "/state_dicts/" + arch + ".pt", map_location=device
-        )
+        state_dict = torch.hub.load_state_dict_from_url(cifar10_pretrained_weight_urls[arch], map_location=device)
         model.load_state_dict(state_dict)
     return model
 
